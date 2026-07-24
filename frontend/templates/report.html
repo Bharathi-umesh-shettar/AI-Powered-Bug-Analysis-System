@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Bug Report #{{ bug_id }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+  body { background:#0b1220; color:#e6edf7; font-family: Inter, system-ui, sans-serif; padding: 32px; }
+  .report { max-width: 960px; margin: 0 auto; background:#111a2e; border:1px solid #1e2a44; border-radius:14px; padding:28px; }
+  h1,h2,h3 { color:#7cc5ff; }
+  .row { margin: 10px 0; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:999px; background:#1e2a44; font-size:12px; margin-right:6px;}
+  ul { margin: 6px 0 12px 22px; }
+  .toolbar { margin-bottom: 20px; display:flex; gap:10px; flex-wrap:wrap; }
+  .toolbar a { background:#1a2542; color:#e6edf7; padding:8px 14px; border-radius:8px; text-decoration:none; border:1px solid #24345a;}
+  .toolbar a:hover { background:#243560; }
+  @media print { .toolbar { display:none; } body { background:#fff; color:#111; } .report { background:#fff; color:#111; border:none;} h1,h2,h3{color:#0a3d91;} }
+</style>
+</head>
+<body>
+<div class="report">
+  <div class="toolbar">
+    <a href="/">← Dashboard</a>
+    <a href="/export/{{ bug_id }}.pdf">Download PDF</a>
+    <a href="/export/{{ bug_id }}.csv">Download CSV</a>
+    <a href="/export/{{ bug_id }}.json">Download JSON</a>
+    <a href="#" onclick="window.print();return false;">Print</a>
+  </div>
+  <h1>Bug Report #{{ bug_id }}</h1>
+  <div id="report-body">Loading...</div>
+</div>
+<script>
+async function load() {
+  const r = await fetch('/structured-findings/{{ bug_id }}');
+  if (!r.ok) { document.getElementById('report-body').textContent = 'Not found'; return; }
+  const d = await r.json();
+  const b = d.bug || {}, a = d.analysis || {}, sims = d.similar_bugs || [];
+  const list = (arr) => (arr||[]).map(x => `<li>${typeof x==='string'?x:JSON.stringify(x)}</li>`).join('');
+  document.getElementById('report-body').innerHTML = `
+    <div class="row"><span class="badge">Severity: ${b.severity||''}</span>
+      <span class="badge">Priority: ${a.priority||''}</span>
+      <span class="badge">Component: ${a.affected_component||b.component||''}</span>
+      <span class="badge">Reporter: ${b.reporter||''}</span></div>
+    <h2>${b.title||''}</h2>
+    <p>${(b.description||'').replace(/\n/g,'<br>')}</p>
+    <h3>Triage</h3><p>${a.reasoning||''} <em>(confidence ${a.confidence||0}%)</em></p>
+    <h3>Log Analysis</h3>
+    <p><b>Exception:</b> ${a.exception_type||'—'}<br>
+       <b>Failure Point:</b> ${a.failure_point||'—'}<br>
+       <b>File / Function / Line:</b> ${a.affected_file||'—'} / ${a.function_name||'—'} / ${a.line_number||'—'}<br>
+       <b>Summary:</b> ${a.structured_summary||'—'}</p>
+    <h3>Root Cause</h3>
+    <p><b>${a.root_cause||'—'}</b> <em>(confidence ${a.root_cause_confidence||0}%)</em></p>
+    <ul>${list(a.supporting_evidence)}</ul>
+    <h3>Duplicate Detection</h3>
+    <p>${a.is_duplicate ? `Duplicate of bug #${a.duplicate_bug_id} (${a.duplicate_similarity}% match)` : 'No high-confidence duplicate found.'}</p>
+    <h3>Remediation</h3>
+    <p><b>Recommended Fix:</b> ${a.recommendation||'—'}</p>
+    <b>Resolution Steps</b><ul>${list(a.resolution_steps)}</ul>
+    <b>Best Practices</b><ul>${list(a.best_practices)}</ul>
+    <h3>Historical Similar Bugs</h3>
+    <ul>${sims.map(s=>`<li>#${s.kb_id} — ${s.title} (${s.similarity_pct}%)</li>`).join('')}</ul>
+  `;
+}
+load();
+</script>
+</body></html>

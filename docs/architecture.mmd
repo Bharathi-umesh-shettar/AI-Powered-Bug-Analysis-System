@@ -1,0 +1,12 @@
+graph TD
+    U[User Browser] -->|HTTP| F[Flask Server]
+    F --> V{Validation}
+    V -->|ok| DB[(SQLite: bugs)]
+    V --> E[SentenceTransformer<br/>all-MiniLM-L6-v2]
+    E --> X[FAISS IndexFlatIP<br/>Cosine over KB vectors]
+    X --> K[(SQLite: knowledge_base)]
+    K --> R[Top-5 Similar Bugs<br/>+ Root Cause + Fix]
+    R --> U
+    subgraph Bootstrap
+      SEED[historical_bugs.csv] --> CLEAN[Clean + Dedupe + Chunk] --> EMB[Embed] --> IDX[Build FAISS] --> K
+    end

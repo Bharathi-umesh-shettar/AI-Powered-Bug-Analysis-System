@@ -1,0 +1,37 @@
+erDiagram
+    BUGS {
+        int bug_id PK
+        string title
+        string description
+        string severity
+        string category
+        string component
+        string stack_trace
+        string error_log
+        string reporter
+        string created_date
+        string embedding_status
+    }
+    KNOWLEDGE_BASE {
+        int kb_id PK
+        string project
+        string title
+        string description
+        string severity
+        string category
+        string component
+        string root_cause
+        string suggested_fix
+        string source
+        string created_date
+    }
+    EMBEDDINGS {
+        int emb_id PK
+        string ref_table
+        int ref_id
+        int faiss_index
+        string status
+        string created_date
+    }
+    BUGS ||--o{ EMBEDDINGS : "generates"
+    KNOWLEDGE_BASE ||--o{ EMBEDDINGS : "generates"

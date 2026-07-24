@@ -1,0 +1,10 @@
+flowchart LR
+    A[Bug Report Input] --> B[Preprocessing<br/>clean / normalize]
+    B --> C[Chunking<br/>500-char windows]
+    C --> D[Embedding<br/>MiniLM-L6-v2]
+    D --> E[FAISS Search<br/>Cosine Similarity]
+    E --> F[Top-K KB IDs]
+    F --> G[SQLite Lookup]
+    G --> H[Enriched Response<br/>root cause + fix]
+    A --> S[(bugs table)]
+    G --> S

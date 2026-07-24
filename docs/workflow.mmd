@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant U as User
+    participant UI as Web UI
+    participant API as Flask API
+    participant DB as SQLite
+    participant EMB as Embedding Model
+    participant FA as FAISS Index
+
+    U->>UI: Fill bug form / upload file
+    UI->>API: POST /submit-bug (JSON)
+    API->>DB: INSERT into bugs
+    API->>EMB: encode(title + description)
+    EMB-->>API: 384-d vector
+    API->>FA: search(top_k=5)
+    FA-->>API: [(kb_id, score)]
+    API->>DB: SELECT knowledge_base WHERE kb_id IN (...)
+    DB-->>API: KB rows
+    API-->>UI: {bug_id, similar_bugs[]}
+    UI-->>U: Render Top-5 cards + refresh stats
