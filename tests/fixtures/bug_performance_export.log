@@ -1,0 +1,10 @@
+ERROR: Export job timed out after 30 seconds
+Component: Reporting
+Environment: Production
+
+Traceback:
+File "backend/reports/export.py", line 88, in generate_export
+    result = database.fetch_large_dataset()
+TimeoutError: database query exceeded 30 seconds
+
+The nightly report export is extremely slow and sometimes fails before completion.

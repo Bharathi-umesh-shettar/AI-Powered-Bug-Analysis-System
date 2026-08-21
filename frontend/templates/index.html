@@ -1,1276 +1,779 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
+    <title>AI-Powered Bug Analysis System</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>AI-Powered Bug Analysis System</title>
-
-
-<link rel="stylesheet"
-href="{{ url_for('static', filename='css/styles.css') }}">
-
-
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-
 
 <body>
 
-
 <header class="app-header">
 
+    <div class="brand">
 
-<div class="brand">
+        <div class="logo">
+            🐞
+        </div>
 
+        <div>
+            <h1>
+                AI-Powered Bug Analysis System
+            </h1>
 
-<div class="logo">
-🐞
-</div>
+            <p>
+                Infosys Springboard Virtual Internship 7.0 · Milestones
+            </p>
+        </div>
 
+    </div>
 
-<div>
-
-<h1>
-AI-Powered Bug Analysis System
-</h1>
-
-
-<p>
-Infosys Springboard Virtual Internship 7.0 · Milestones
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-<nav>
-
-
-<a href="#dashboard">Dashboard</a>
-
-<a href="#submit">Submit Bug</a>
-
-<a href="#analysis">AI Analysis</a>
-
-<a href="#root-cause">Root Cause</a>
-
-<a href="#duplicate">Duplicate Detection</a>
-
-<a href="#remediation">Remediation</a>
-
-<a href="#findings">Structured Findings</a>
-
-<a href="#similar">Similar Bugs</a>
-
-<a href="#records">Records</a>
-
-<a href="#watcher">Auto-Watch</a>
-
-<a href="#validation">Validation</a>
-
-<a href="#report">Report Export</a>
-
-
-</nav>
-
-
+    <nav>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#submit">Submit Bug</a>
+        <a href="#analysis">AI Analysis</a>
+        <a href="#root-cause">Root Cause</a>
+        <a href="#duplicate">Duplicate Detection</a>
+        <a href="#remediation">Remediation</a>
+        <a href="#findings">Structured Findings</a>
+        <a href="#similar">Similar Bugs</a>
+        <a href="#records">Records</a>
+        <a href="#watcher">Auto-Watch</a>
+        <a href="#validation">Validation</a>
+        <a href="#report">Report Export</a>
+    </nav>
 
 </header>
 
 
-
-
-
 <main>
 
-
-
-
-
-<!-- ================= DASHBOARD ================= -->
-
+<!-- ========================================================= -->
+<!-- DASHBOARD -->
+<!-- ========================================================= -->
 
 <section id="dashboard" class="section">
 
+    <h2>Dashboard</h2>
 
-<h2>
-Dashboard
-</h2>
+    <div class="cards" id="stats-cards">
 
+        <div class="card gradient-blue">
+            <span class="card-icon">🐛</span>
+            <div>
+                <h3 id="stat-total">0</h3>
+                <p>Total Bugs</p>
+            </div>
+        </div>
 
+        <div class="card gradient-red">
+            <span class="card-icon">🔥</span>
+            <div>
+                <h3 id="stat-critical">0</h3>
+                <p>Critical Bugs</p>
+            </div>
+        </div>
 
-<div class="cards" id="stats-cards">
+        <div class="card gradient-cyan">
+            <span class="card-icon">📚</span>
+            <div>
+                <h3 id="stat-kb">0</h3>
+                <p>Knowledge Base</p>
+            </div>
+        </div>
 
+        <div class="card gradient-purple">
+            <span class="card-icon">📑</span>
+            <div>
+                <h3 id="stat-dup">0</h3>
+                <p>Duplicate Bugs</p>
+            </div>
+        </div>
 
+        <div class="card">
+            <span class="card-icon">🤖</span>
+            <div>
+                <h3 id="stat-analyses">0</h3>
+                <p>AI Analyses</p>
+            </div>
+        </div>
 
-<div class="card gradient-blue">
+    </div>
 
-<span class="card-icon">🐛</span>
+    <h3 class="subheading">
+        Recent Bugs
+    </h3>
 
-<div>
-
-<h3 id="stat-total">0</h3>
-
-<p>Total Bugs</p>
-
-</div>
-
-</div>
-
-
-
-
-<div class="card gradient-red">
-
-<span class="card-icon">🔥</span>
-
-<div>
-
-<h3 id="stat-critical">0</h3>
-
-<p>Critical Bugs</p>
-
-</div>
-
-</div>
-
-
-
-
-<div class="card gradient-cyan">
-
-<span class="card-icon">📚</span>
-
-<div>
-
-<h3 id="stat-kb">0</h3>
-
-<p>Knowledge Base</p>
-
-</div>
-
-</div>
-
-
-
-
-<div class="card gradient-purple">
-
-<span class="card-icon">📑</span>
-
-<div>
-
-<h3 id="stat-dup">0</h3>
-
-<p>Duplicate Bugs</p>
-
-</div>
-
-</div>
-
-
-
-</div>
-
-
-
-
-<h3 class="subheading">
-Recent Bugs
-</h3>
-
-
-<ul id="recent-bugs" class="recent-list">
-
-</ul>
-
-
+    <ul id="recent-bugs" class="recent-list">
+    </ul>
 
 </section>
 
 
-
-
-
-
-
-<!-- ================= SUBMIT BUG ================= -->
-
+<!-- ========================================================= -->
+<!-- SUBMIT BUG -->
+<!-- ========================================================= -->
 
 <section id="submit" class="section">
 
+    <h2>Submit a Bug</h2>
 
-<h2>
-Submit a Bug
-</h2>
+    <div class="two-col">
 
+        <!-- NORMAL BUG FORM -->
 
+        <form id="bug-form" class="panel">
 
-<div class="two-col">
+            <h3>Manual Bug Submission</h3>
 
+            <label>
+                Title
+                <input type="text"
+                       name="title"
+                       required>
+            </label>
 
+            <label>
+                Description
+                <textarea name="description"
+                          rows="4"
+                          required></textarea>
+            </label>
 
+            <div class="row">
 
+                <label>
+                    Steps to Reproduce
+                    <textarea name="steps_to_reproduce"
+                              rows="2"></textarea>
+                </label>
 
-<form id="bug-form" class="panel">
+                <label>
+                    Environment
+                    <input type="text"
+                           name="environment"
+                           placeholder="OS / Browser / Version">
+                </label>
 
+            </div>
 
+            <div class="row">
 
-<label>
+                <label>
+                    Expected Behavior
+                    <textarea name="expected_behavior"
+                              rows="2"></textarea>
+                </label>
 
-Title
+                <label>
+                    Actual Behavior
+                    <textarea name="actual_behavior"
+                              rows="2"></textarea>
+                </label>
 
-<input type="text"
-name="title"
-required>
+            </div>
 
-</label>
+            <div class="row">
 
+                <label>
+                    Severity
 
+                    <select name="severity">
 
+                        <option value="Low">
+                            Low
+                        </option>
 
+                        <option value="Medium" selected>
+                            Medium
+                        </option>
 
-<label>
+                        <option value="High">
+                            High
+                        </option>
 
-Description
+                        <option value="Critical">
+                            Critical
+                        </option>
 
-<textarea name="description"
-rows="4"
-required></textarea>
+                    </select>
+                </label>
 
-</label>
+                <label>
+                    Category
 
+                    <select name="category">
 
+                        <option value="General">
+                            General
+                        </option>
 
+                        <option value="Bug">
+                            Bug
+                        </option>
 
+                        <option value="Crash">
+                            Crash
+                        </option>
 
-<div class="row">
+                        <option value="Performance">
+                            Performance
+                        </option>
 
+                        <option value="Security">
+                            Security
+                        </option>
 
-<label>
+                        <option value="UI Bug">
+                            UI Bug
+                        </option>
 
-Steps to Reproduce
+                    </select>
+                </label>
 
-<textarea name="steps_to_reproduce"
-rows="2"></textarea>
+            </div>
 
+            <div class="row">
 
-</label>
+                <label>
+                    Component
+                    <input type="text"
+                           name="component">
+                </label>
 
+                <label>
+                    Reporter
+                    <input type="text"
+                           name="reporter"
+                           placeholder="Your name">
+                </label>
 
+            </div>
 
-<label>
+            <label>
+                Stack Trace
+                <textarea name="stack_trace"
+                          rows="4"
+                          placeholder="Paste stack trace here..."></textarea>
+            </label>
 
-Environment
+            <label>
+                Error Log
+                <textarea name="error_log"
+                          rows="4"
+                          placeholder="Paste error log here..."></textarea>
+            </label>
 
-<input type="text"
-name="environment"
-placeholder="OS / Browser / Version">
+            <button type="submit"
+                    class="btn primary">
+                🤖 Analyze Bug
+            </button>
 
+        </form>
 
-</label>
 
+        <!-- UPLOAD FORM -->
 
-</div>
+        <form id="upload-form" class="panel">
 
+            <h3>📂 Upload Bug Report</h3>
 
+            <p class="muted">
+                Accepts .txt and .log files
+            </p>
 
+            <label>
+                File
 
+                <input type="file"
+                       name="file"
+                       accept=".txt,.log"
+                       required>
+            </label>
 
+            <label>
+                Title (optional)
 
-<div class="row">
+                <input type="text"
+                       name="title">
+            </label>
 
+            <label>
+                Description (optional)
 
-<label>
+                <textarea name="description"
+                          rows="3"></textarea>
+            </label>
 
-Expected Behavior
+            <div class="row">
 
-<textarea name="expected_behavior"
-rows="2"></textarea>
+                <label>
+                    Severity
 
+                    <select name="severity">
 
-</label>
+                        <option value="Low">
+                            Low
+                        </option>
 
+                        <option value="Medium" selected>
+                            Medium
+                        </option>
 
+                        <option value="High">
+                            High
+                        </option>
 
-<label>
+                        <option value="Critical">
+                            Critical
+                        </option>
 
-Actual Behavior
+                    </select>
+                </label>
 
-<textarea name="actual_behavior"
-rows="2"></textarea>
+                <label>
+                    Component
 
+                    <input type="text"
+                           name="component">
+                </label>
 
-</label>
+            </div>
 
+            <label>
+                Reporter
 
+                <input type="text"
+                       name="reporter"
+                       placeholder="Your name">
+            </label>
 
-</div>
+            <label>
+                Environment
 
+                <input type="text"
+                       name="environment"
+                       placeholder="OS / Browser / Version">
+            </label>
 
+            <button type="submit"
+                    class="btn secondary">
+                📤 Upload & Analyze
+            </button>
 
+        </form>
 
-
-<div class="row">
-
-
-
-<label>
-
-Severity
-
-
-<select name="severity">
-
-
-<option>
-Low
-</option>
-
-<option selected>
-Medium
-</option>
-
-<option>
-High
-</option>
-
-<option>
-Critical
-</option>
-
-
-</select>
-
-
-</label>
-
-
-
-
-<label>
-
-Category
-
-
-<select name="category">
-
-
-<option>
-General
-</option>
-
-
-<option>
-Bug
-</option>
-
-
-<option>
-Crash
-</option>
-
-
-<option>
-Performance
-</option>
-
-
-<option>
-Security
-</option>
-
-
-<option>
-UI Bug
-</option>
-
-
-</select>
-
-
-</label>
-
-
-
-</div>
-
-
-
-
-
-
-
-<div class="row">
-
-
-<label>
-
-Component
-
-
-<input type="text"
-name="component">
-
-
-</label>
-
-
-
-
-<label>
-
-Reporter
-
-
-<input type="text"
-name="reporter"
-placeholder="Your name">
-
-
-</label>
-
-
-
-</div>
-
-
-
-
-
-
-<label>
-
-Stack Trace
-
-
-<textarea name="stack_trace"
-rows="3"></textarea>
-
-
-</label>
-
-
-
-
-
-
-<label>
-
-Error Log
-
-
-<textarea name="error_log"
-rows="3"></textarea>
-
-
-</label>
-
-
-
-
-
-<button type="submit"
-class="btn primary">
-
-Analyze Bug
-
-</button>
-
-
-
-</form>
-
-
-
-
-
-
-
-<form id="upload-form"
-class="panel">
-
-
-<h3>
-Upload Bug Report
-</h3>
-
-
-
-<p class="muted">
-
-Accepts .txt and .log files
-
-</p>
-
-
-
-
-<label>
-
-File
-
-<input type="file"
-name="file"
-accept=".txt,.log"
-required>
-
-</label>
-
-
-
-
-
-<label>
-
-Title (optional)
-
-<input type="text"
-name="title">
-
-</label>
-
-
-
-
-
-<label>
-
-Description (optional)
-
-<textarea name="description"
-rows="2"></textarea>
-
-</label>
-
-
-
-
-
-<div class="row">
-
-
-<label>
-
-Severity
-
-
-<select name="severity">
-
-
-<option>
-Low
-</option>
-
-
-<option selected>
-Medium
-</option>
-
-
-<option>
-High
-</option>
-
-
-<option>
-Critical
-</option>
-
-
-</select>
-
-
-</label>
-
-
-
-
-
-<label>
-
-Component
-
-
-<input type="text"
-name="component">
-
-
-</label>
-
-
-
-</div>
-
-
-
-
-
-<button type="submit"
-class="btn secondary">
-
-Upload & Analyze
-
-</button>
-
-
-
-</form>
-
-
-
-</div>
-
+    </div>
 
 </section>
-<!-- ================= AI ANALYSIS ================= -->
+
+
+<!-- ========================================================= -->
+<!-- AI ANALYSIS -->
+<!-- ========================================================= -->
 
 <section id="analysis" class="section">
 
-<h2>
-Combined AI Analysis
-</h2>
+    <h2>Combined AI Analysis</h2>
 
+    <div id="analysis-container"
+         class="panel">
 
-<div id="analysis-container">
+        <p class="muted">
+            Submit a bug to run the AI analysis pipeline.
+        </p>
 
-<p class="muted">
-Submit a bug to run the Triage & Log Analysis agents.
-</p>
+    </div>
 
-</div>
+    <h3 class="subheading">
+        Recent Analyses
+    </h3>
 
-
-
-<h3 class="subheading">
-Recent Analyses
-</h3>
-
-
-<div id="recent-analyses"
-class="analysis-grid">
-
-</div>
-
+    <div id="recent-analyses"
+         class="analysis-grid">
+    </div>
 
 </section>
 
 
-
-
-
-<!-- ================= ROOT CAUSE ================= -->
-
+<!-- ========================================================= -->
+<!-- ROOT CAUSE -->
+<!-- ========================================================= -->
 
 <section id="root-cause" class="section">
 
+    <h2>Root Cause Analysis</h2>
 
-<h2>
-Root Cause Analysis
-</h2>
+    <div id="root-cause-container"
+         class="panel">
 
+        <p class="muted">
+            Root cause will appear here after analysis.
+        </p>
 
-<div id="root-cause-container"
-class="panel">
-
-
-<p class="muted">
-Root cause will appear here.
-</p>
-
-
-</div>
-
+    </div>
 
 </section>
 
 
-
-
-
-
-<!-- ================= DUPLICATE ================= -->
-
+<!-- ========================================================= -->
+<!-- DUPLICATE -->
+<!-- ========================================================= -->
 
 <section id="duplicate" class="section">
 
+    <h2>Duplicate Detection</h2>
 
-<h2>
-Duplicate Detection
-</h2>
+    <div id="duplicate-container"
+         class="panel">
 
+        <p class="muted">
+            Duplicate detection results will appear here.
+        </p>
 
-<div id="duplicate-container"
-class="panel">
-
-
-<p class="muted">
-Duplicate detection results will appear here.
-</p>
-
-
-</div>
-
+    </div>
 
 </section>
 
 
-
-
-
-
-<!-- ================= REMEDIATION ================= -->
-
+<!-- ========================================================= -->
+<!-- REMEDIATION -->
+<!-- ========================================================= -->
 
 <section id="remediation" class="section">
 
+    <h2>AI Remediation Recommendation</h2>
 
-<h2>
-AI Remediation Recommendation
-</h2>
+    <div id="remediation-container"
+         class="panel">
 
+        <p class="muted">
+            AI recommendations will appear here.
+        </p>
 
-
-<div id="remediation-container"
-class="panel">
-
-
-<p class="muted">
-AI recommendations will appear here.
-</p>
-
-
-</div>
-
+    </div>
 
 </section>
 
 
-
-
-
-
-<!-- ================= STRUCTURED FINDINGS ================= -->
-
+<!-- ========================================================= -->
+<!-- STRUCTURED FINDINGS -->
+<!-- ========================================================= -->
 
 <section id="findings" class="section">
 
+    <h2>Structured Findings</h2>
 
-<h2>
-Structured Findings
-</h2>
+    <div id="structured-findings-container"
+         class="panel">
 
+        <p class="muted">
+            Combined AI findings will appear here.
+        </p>
 
-
-<div id="structured-findings-container"
-class="panel">
-
-
-<p class="muted">
-Combined AI findings will appear here.
-</p>
-
-
-</div>
-
+    </div>
 
 </section>
 
 
-
-
-
-
-
-<!-- ================= REPORT EXPORT ================= -->
-
+<!-- ========================================================= -->
+<!-- REPORT EXPORT -->
+<!-- ========================================================= -->
 
 <section id="report" class="section">
 
+    <h2>Report Export</h2>
 
-<h2>
-Report Export
-</h2>
+    <div class="toolbar">
 
+        <input id="export-bug-id"
+               type="number"
+               min="1"
+               placeholder="Enter Bug ID">
 
+        <button id="export-json"
+                class="btn secondary">
+            Export JSON
+        </button>
 
-<div class="toolbar">
+        <button id="export-csv"
+                class="btn secondary">
+            Export CSV
+        </button>
 
+        <button id="export-pdf"
+                class="btn primary">
+            Export PDF
+        </button>
 
-<button id="export-json"
-class="btn secondary">
-
-Export JSON
-
-</button>
-
-
-
-
-<button id="export-csv"
-class="btn secondary">
-
-Export CSV
-
-</button>
-
-
-
-
-
-<button id="export-pdf"
-class="btn primary">
-
-Export PDF
-
-</button>
-
-
-
-</div>
-
+    </div>
 
 </section>
 
 
-
-
-
-
-
-<!-- ================= SIMILAR BUGS ================= -->
-
+<!-- ========================================================= -->
+<!-- SIMILAR BUGS -->
+<!-- ========================================================= -->
 
 <section id="similar" class="section">
 
+    <h2>Top-5 Similar Historical Bugs</h2>
 
-<h2>
-Top-5 Similar Historical Bugs
-</h2>
+    <div id="similar-container"
+         class="similar-grid">
 
+        <p class="muted">
+            Submit or upload a bug to see AI-retrieved similar cases.
+        </p>
 
-
-
-<div id="similar-container"
-class="similar-grid">
-
-
-<p class="muted">
-
-Submit or upload a bug to see AI-retrieved similar cases.
-
-</p>
-
-
-</div>
-
+    </div>
 
 </section>
 
 
-
-
-
-
-
-<!-- ================= RECORDS ================= -->
-
+<!-- ========================================================= -->
+<!-- DATABASE RECORDS -->
+<!-- ========================================================= -->
 
 <section id="records" class="section">
 
+    <h2>Database Records</h2>
 
-<h2>
-Database Records
-</h2>
+    <div class="toolbar">
 
+        <input id="search"
+               type="search"
+               placeholder="Search bugs...">
 
+        <select id="sort">
 
+            <option value="bug_id-desc">
+                Newest first
+            </option>
 
-<div class="toolbar">
+            <option value="bug_id-asc">
+                Oldest first
+            </option>
 
+            <option value="severity-asc">
+                Severity A-Z
+            </option>
 
-<input id="search"
-type="search"
-placeholder="Search bugs...">
+            <option value="title-asc">
+                Title A-Z
+            </option>
 
+        </select>
 
+    </div>
 
+    <div class="table-wrap">
 
+        <table id="bugs-table">
 
-<select id="sort">
+            <thead>
 
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Severity</th>
+                    <th>Category</th>
+                    <th>Component</th>
+                    <th>Reporter</th>
+                    <th>Created</th>
+                </tr>
 
-<option value="bug_id-desc">
-Newest first
-</option>
+            </thead>
 
+            <tbody>
+            </tbody>
 
-<option value="bug_id-asc">
-Oldest first
-</option>
+        </table>
 
+    </div>
 
-<option value="severity-asc">
-Severity A-Z
-</option>
+    <div class="pagination">
 
+        <button id="prev"
+                class="btn ghost">
+            Prev
+        </button>
 
-<option value="title-asc">
-Title A-Z
-</option>
+        <span id="page-info">
+            Page 1
+        </span>
 
+        <button id="next"
+                class="btn ghost">
+            Next
+        </button>
 
-</select>
-
-
-</div>
-
-
-
-
-
-
-<div class="table-wrap">
-
-
-<table id="bugs-table">
-
-
-<thead>
-
-<tr>
-
-<th>ID</th>
-
-<th>Title</th>
-
-<th>Severity</th>
-
-<th>Category</th>
-
-<th>Component</th>
-
-<th>Reporter</th>
-
-<th>Created</th>
-
-
-</tr>
-
-
-</thead>
-
-
-
-<tbody>
-
-</tbody>
-
-
-
-</table>
-
-
-
-</div>
-
-
-
-
-
-
-
-<div class="pagination">
-
-
-<button id="prev"
-class="btn ghost">
-
-Prev
-
-</button>
-
-
-
-<span id="page-info">
-Page 1
-</span>
-
-
-
-
-<button id="next"
-class="btn ghost">
-
-Next
-
-</button>
-
-
-
-</div>
-
-
+    </div>
 
 </section>
 
 
+<!-- ========================================================= -->
+<!-- AUTO WATCHER -->
+<!-- ========================================================= -->
 
+<section id="watcher" class="section">
 
+    <h2>
+        📂 Automatic Folder Watcher
+    </h2>
 
+    <p class="muted">
 
+        Drop any
+        <strong>.log</strong>
+        or
+        <strong>.txt</strong>
+        file into
 
-<!-- ================= AUTO WATCHER ================= -->
+        <code id="watch-dir">
+            logs/
+        </code>
 
+        folder.
 
-<section id="watcher"
-class="section">
+    </p>
 
+    <div class="toolbar">
 
-<h2>
-📂 Automatic Folder Watcher
-</h2>
+        <button id="watcher-scan"
+                class="btn primary">
+            🔍 Scan Now
+        </button>
 
+        <button id="watcher-refresh"
+                class="btn ghost">
+            🔄 Refresh Status
+        </button>
 
+        <button id="watcher-start"
+                class="btn secondary">
+            ▶ Start Watcher
+        </button>
 
-<p class="muted">
+        <button id="watcher-stop"
+                class="btn ghost">
+            ⏹ Stop Watcher
+        </button>
 
-Drop any .log or .txt file into
+        <span id="watcher-state"
+              class="muted">
+            status: unknown
+        </span>
 
-<code id="watch-dir">
-logs/
-</code>
+    </div>
 
-folder.
+    <div class="table-wrap">
 
-</p>
+        <table id="watcher-table">
 
+            <thead>
 
+                <tr>
 
+                    <th>Bug ID</th>
+                    <th>File</th>
+                    <th>Severity</th>
+                    <th>Component</th>
+                    <th>Exception</th>
+                    <th>Confidence</th>
+                    <th>Processed</th>
 
+                </tr>
 
-<div class="toolbar">
+            </thead>
 
+            <tbody>
+            </tbody>
 
-<button id="watcher-scan"
-class="btn primary">
+        </table>
 
-Scan Now
-
-</button>
-
-
-
-
-<button id="watcher-refresh"
-class="btn ghost">
-
-Refresh Status
-
-</button>
-
-
-
-
-<span id="watcher-state"
-class="muted">
-
-status: unknown
-
-</span>
-
-
-
-</div>
-
-
-
-
-
-
-<div class="table-wrap">
-
-
-<table id="watcher-table">
-
-
-<thead>
-
-
-<tr>
-
-<th>Bug ID</th>
-
-<th>File</th>
-
-<th>Severity</th>
-
-<th>Component</th>
-
-<th>Exception</th>
-
-<th>Confidence</th>
-
-<th>Processed</th>
-
-
-</tr>
-
-
-</thead>
-
-
-
-<tbody>
-
-</tbody>
-
-
-</table>
-
-
-</div>
-
-
+    </div>
 
 </section>
 
 
-
-
-
-
-
-<!-- ================= VALIDATION ================= -->
-
+<!-- ========================================================= -->
+<!-- VALIDATION -->
+<!-- ========================================================= -->
 
 <section id="validation"
-class="section">
+         class="section">
 
+    <h2>
+        Agent Validation Suite
+    </h2>
 
-<h2>
-Agent Validation Suite
-</h2>
+    <p class="muted">
+        Runs the validation suite against curated bug cases.
+    </p>
 
+    <button id="run-validation"
+            class="btn primary">
+        🧪 Run Validation
+    </button>
 
+    <div id="validation-summary"
+         class="cards">
+    </div>
 
+    <div class="table-wrap">
 
-<p class="muted">
+        <table id="validation-table">
 
-Runs both agents against curated bug cases.
+            <thead>
 
-</p>
+                <tr>
 
+                    <th>Case</th>
+                    <th>Triage</th>
+                    <th>Log</th>
+                    <th>Severity</th>
+                    <th>Priority</th>
+                    <th>Component</th>
+                    <th>Confidence</th>
+                    <th>Exception</th>
 
+                </tr>
 
+            </thead>
 
-<button id="run-validation"
-class="btn primary">
+            <tbody>
+            </tbody>
 
-Run Validation
+        </table>
 
-</button>
-
-
-
-
-<div id="validation-summary"
-class="cards">
-
-</div>
-
-
-
-
-
-<div class="table-wrap">
-
-
-<table id="validation-table">
-
-
-<thead>
-
-
-<tr>
-
-<th>Case</th>
-
-<th>Triage</th>
-
-<th>Log</th>
-
-<th>Severity</th>
-
-<th>Priority</th>
-
-<th>Component</th>
-
-<th>Confidence</th>
-
-<th>Exception</th>
-
-
-</tr>
-
-
-</thead>
-
-
-
-<tbody>
-
-</tbody>
-
-
-
-</table>
-
-
-</div>
-
-
+    </div>
 
 </section>
-
-
-
-
 
 </main>
 
 
-
-
-
+<!-- ========================================================= -->
+<!-- FOOTER -->
+<!-- ========================================================= -->
 
 <footer>
 
-<p>
-
-© 2025 · AI-Powered Bug Analysis System · Milestones Deliverable
-
-</p>
-
+    <p>
+        © 2026 · AI-Powered Bug Analysis System ·
+        Infosys Springboard Virtual Internship 7.0
+    </p>
 
 </footer>
 
 
-
-
-
-
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 
-
 </body>
-
 </html>

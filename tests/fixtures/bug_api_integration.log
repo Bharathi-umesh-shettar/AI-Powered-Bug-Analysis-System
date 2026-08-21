@@ -1,0 +1,10 @@
+ERROR: External API request failed
+Component: API Integration
+Environment: Production
+
+Traceback:
+File "backend/integrations/payment_api.py", line 72, in call_external_api
+    response = requests.post(api_url, json=payload)
+requests.exceptions.ConnectionError: Connection refused
+
+The application cannot connect to the external payment service.

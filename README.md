@@ -1,129 +1,163 @@
-# 🐞 AI-Powered Bug Analysis System
+# Creation of Intelligent Bug Diagnosis Platform with Fix Recommendation Assistance — Group 1
 
-**Infosys Springboard Virtual Internship 7.0 — Milestone 1**
+A full-stack Flask + RAG platform that ingests bug reports, retrieves similar
+historical defects with **Sentence Transformers + FAISS**, runs a **multi-agent
+diagnosis** to produce structured findings and a recommended fix, exports
+PDF/CSV reports, analyses **defect patterns**, and **grows its own knowledge
+base** from verified fixes.
 
-An end-to-end Retrieval-Augmented Generation (RAG) system that ingests bug
-reports, embeds them with `all-MiniLM-L6-v2`, retrieves the top-5 most
-similar historical defects from a FAISS vector index, and surfaces
-root-cause + fix suggestions through a professional dark-blue web UI.
-
----
-
-## ✨ Features
-
-- **Bug Submission Module** — manual form + `.txt` / `.log` upload
-- **Historical Knowledge Base** — seeded from Mozilla / Apache / Eclipse / Kaggle style records
-- **RAG Pipeline** — Sentence-Transformer embeddings + FAISS `IndexFlatIP` (cosine)
-- **Top-5 Semantic Similarity** — score, root cause, suggested fix, category
-- **Multi-Agent Architecture (design)** — Triage / Log Analysis / Root Cause / Duplicate / Remediation
-- **SQLite storage** for `bugs`, `knowledge_base`, `embeddings`
-- **Professional dashboard** — gradient cards, animations, dark blue theme
-- **REST APIs** — `/health`, `/submit-bug`, `/upload-bug`, `/all-bugs`, `/knowledge-base`, `/stats`, `/agents`
-- **Documentation** — Mermaid architecture, workflow, DFD, ER diagrams
+Milestones: **M1** submission + storage + RAG · **M2** validation, `.txt`/`.log`
+upload, Auto-Watch folder monitoring · **M3** multi-agent diagnosis + reports ·
+**M4** defect pattern analytics, knowledge-base growth, end-to-end testing,
+documentation.
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
-Python 3.11+, Flask, HTML5/CSS3/JavaScript, SQLite,
-Sentence-Transformers (`all-MiniLM-L6-v2`), FAISS, Pandas, NumPy.
+- **Backend:** Python 3.10+, Flask, SQLite
+- **AI / RAG:** Sentence Transformers (`all-MiniLM-L6-v2`), FAISS (cosine similarity), deterministic hashing fallback for offline runs
+- **Reports:** ReportLab (PDF, optional), csv (always)
+- **Frontend:** HTML5, CSS3, vanilla JavaScript — five-tab responsive dashboard
+- **Testing:** pytest end-to-end suite
 
----
-
-## 🚀 Installation
-
-```bash
-git clone <your-repo-url>
-cd BugAnalysisProject
-python -m venv .venv
-source .venv/bin/activate           # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
-```
-
-Open <http://127.0.0.1:5000>.
-
-The first run downloads the sentence-transformer model (~90 MB) and
-builds the FAISS index from `datasets/historical_bugs.csv`. Subsequent
-runs load the persisted index from `models/`.
-
----
-
-## 📁 Folder Structure
+## Project Structure
 
 ```
 BugAnalysisProject/
-├── app.py
-├── requirements.txt
-├── README.md
-├── .gitignore
 ├── backend/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── database.py
-│   ├── embeddings.py
-│   ├── knowledge_base.py
-│   ├── agents.py
-│   └── server.py
-├── frontend/
-│   ├── templates/index.html
-│   └── static/
-│       ├── css/styles.css
-│       └── js/app.js
-├── datasets/historical_bugs.csv
-├── docs/
-│   ├── PROJECT_REPORT.md
-│   ├── INSTALLATION.md
-│   ├── architecture.mmd
-│   ├── workflow.mmd
-│   ├── data_flow.mmd
-│   └── er_diagram.mmd
-└── models/         # FAISS index + metadata (auto-generated)
+│   ├── app.py               # Flask app + REST APIs
+│   ├── config.py            # all paths / thresholds (env-overridable)
+│   ├── database.py          # SQLite schema + non-destructive migration
+│   ├── rag.py               # embeddings + FAISS index (persisted)
+│   ├── ingest.py            # validation + log/text parsing
+│   ├── agents.py            # analysis / duplicate / remediation agents
+│   ├── service.py           # shared ingest -> diagnose -> persist path
+│   ├── autowatch.py         # background folder monitor (M2)
+│   ├── knowledge.py         # verified-fix knowledge-base growth (M4.2)
+│   ├── analytics.py         # defect pattern analytics (M4.1)
+│   ├── reports.py           # PDF / CSV exports
+│   ├── import_dataset.py    # CSV -> knowledge_base importer
+│   └── requirements.txt
+├── datasets/bug_dataset.csv # 200-record historical knowledge base
+├── logs_watch/              # drop .log/.txt here for Auto-Watch
+├── templates/index.html
+├── static/{style.css,script.js}
+├── tests/                   # end-to-end suite + 5 bug fixtures (M4.3)
+└── docs/
+    ├── TECHNICAL_DOCUMENTATION.md
+    └── TEST_REPORT.md
 ```
 
----
-
-## 🔌 REST API
-
-| Method | Endpoint          | Purpose                              |
-| ------ | ----------------- | ------------------------------------ |
-| GET    | `/health`         | Health check                         |
-| POST   | `/submit-bug`     | Submit bug JSON + get similar bugs   |
-| POST   | `/upload-bug`     | Upload `.txt` / `.log` bug report    |
-| GET    | `/all-bugs`       | All submitted bugs                   |
-| GET    | `/knowledge-base` | KB entries                           |
-| GET    | `/stats`          | Dashboard stats                      |
-| GET    | `/agents`         | Multi-agent design specification     |
-
-Example:
+## Installation
 
 ```bash
-curl -X POST http://127.0.0.1:5000/submit-bug \
-  -H "Content-Type: application/json" \
-  -d '{"title":"SSL handshake fails","description":"TLS 1.3 handshake error","severity":"High","component":"Network"}'
+cd BugAnalysisProject/backend
+python -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
----
+## Running
 
-## 📚 Documentation
+```bash
+cd BugAnalysisProject/backend
+python app.py
+```
 
-- [Project Report](docs/PROJECT_REPORT.md)
-- [Installation Guide](docs/INSTALLATION.md)
-- [Architecture Diagram](docs/architecture.mmd)
-- [Workflow Diagram](docs/workflow.mmd)
-- [Data Flow Diagram](docs/data_flow.mmd)
-- [ER Diagram](docs/er_diagram.mmd)
+Open <http://localhost:5000>. The first launch seeds `knowledge_base` from the
+CSV, downloads `all-MiniLM-L6-v2` (~90 MB) and builds/persists the FAISS index.
+No network? Run with `EMBEDDING_BACKEND=hashing` to use the offline embedder.
 
----
+## Using the dashboard
 
-## ✅ Milestone 1 Deliverables
+1. **Submit** — fill the form (or upload a `.txt`/`.log` report) and get
+   structured findings: summary, error types, component, root cause,
+   recommended fix, prevention steps, duplicate verdict, top-5 similar bugs.
+2. **Records** — search/filter by text, status, severity, component; re-analyze,
+   change status, download per-bug PDF/CSV, or export all bugs.
+3. **Auto-Watch** — start/stop the monitor or scan once; drop files into
+   `logs_watch/` and they are ingested and diagnosed automatically.
+4. **Analytics** — KPIs, severity/status distribution, component and category
+   frequency, time trend, recurring themes; export PDF/CSV.
+5. **Knowledge Base** — browse/search entries; resolve a bug with a confirmed
+   fix and mark it **Resolved & Verified** to add it to the knowledge base and
+   the live FAISS index.
 
-Defect-analysis study · RAG architecture · Semantic similarity · Bug-report
-schema · Architecture design · Agent responsibilities · Orchestration flow ·
-KB model · Working bug submission · File upload · Historical KB · Data
-preprocessing · Chunking · Embedding generation · FAISS indexing · Working
-similarity search · Design docs · Tech stack · GitHub-ready.
+## REST API
 
----
+Milestone 1 contracts are unchanged (`/`, `/health`, `/submit-bug`,
+`/upload-bug`, `/all-bugs`). Full endpoint table:
+[docs/TECHNICAL_DOCUMENTATION.md](docs/TECHNICAL_DOCUMENTATION.md#8-http-api).
 
-© 2025 — Built for the Infosys Springboard Virtual Internship 7.0.
+### `.txt` / `.log` upload format
+
+```
+Title: Login fails on Safari
+Description: OAuth redirect drops the session cookie.
+Severity: High
+Component: auth-service
+Stack_trace: TypeError: cannot read property 'token' of undefined
+```
+
+Free-form logs work too — the parser infers title, severity, component and
+stack trace heuristically.
+
+## Configuration
+
+Every path and threshold lives in `backend/config.py` and is env-overridable:
+`BUG_DB_PATH`, `FAISS_INDEX_PATH`, `BUG_DATASET_PATH`, `WATCH_DIR`,
+`WATCH_INTERVAL_SECONDS`, `REPORT_DIR`, `EMBEDDING_MODEL`,
+`EMBEDDING_BACKEND` (`auto|sentence-transformers|hashing`), `RAG_TOP_K`,
+`DUPLICATE_THRESHOLD`, `SIMILAR_THRESHOLD`, `AUTOWATCH_ON_START`.
+
+## Testing
+
+```bash
+cd BugAnalysisProject
+python -m pytest tests -q
+```
+
+Runs in an isolated temp database / index / watch folder — your `bugs.db` is
+never touched. Latest result: **22 passed**, covering five distinct bug types
+across all three ingestion channels. See [docs/TEST_REPORT.md](docs/TEST_REPORT.md).
+
+## How RAG works
+
+1. Knowledge entries are encoded to 384-dim vectors and L2-normalised.
+2. `faiss.IndexFlatIP` gives cosine similarity; index + metadata are persisted.
+3. Each submission is encoded (title + description + stack trace) and searched.
+4. Top-k matches feed the duplicate verdict and the fix recommendation.
+5. Verified fixes are appended incrementally, so retrieval improves over time.
+
+## Architecture
+
+```
+ ┌──────────┐        ┌──────────────┐  SQL   ┌────────────┐
+ │ Browser  │───────▶│  Flask app   │───────▶│ SQLite DB  │
+ │ 5-tab UI │◀───────│  (app.py)    │◀───────│ bugs.db    │
+ └──────────┘        └───┬───┬──────┘        └────────────┘
+ logs_watch/ ──▶ autowatch│   │ service.ingest_and_diagnose
+                          │   ▼
+                          │  ┌──────────────────────────────┐
+                          │  │ DiagnosisPipeline            │
+                          │  │ Analysis▸Duplicate▸Remediation│
+                          │  └───────────┬──────────────────┘
+                          │              ▼
+                          │      ┌───────────────┐   ┌──────────────┐
+                          │      │ MiniLM encode │──▶│ FAISS index  │
+                          │      └───────────────┘   └──────┬───────┘
+                          ▼                  verified fixes │
+                 analytics / reports ◀───── knowledge.py ────┘
+```
+
+## Project Documentation
+
+- [MIT License](../LICENSE)
+- [Agile Documentation](docs/AGILE_DOCUMENTATION.md)
+- [Technical Documentation](docs/TECHNICAL_DOCUMENTATION.md)
+- [Test Report](docs/TEST_REPORT.md)
+
+## License
+
+MIT — free for academic and Infosys Springboard Internship submissions.

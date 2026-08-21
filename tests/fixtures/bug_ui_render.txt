@@ -1,0 +1,7 @@
+Title: Report table renders blank on mobile Safari
+Description: The analytics report table shows no rows on mobile Safari. The data request succeeds but the rendered table body is empty and the console reports a null reference while mapping rows.
+Severity: Medium
+Component: Frontend
+Environment: iOS Safari 17
+Error: TypeError: null is not an object (evaluating 'rows.map')
+Stack_trace: at ReportTable (static/script.js:214:31)

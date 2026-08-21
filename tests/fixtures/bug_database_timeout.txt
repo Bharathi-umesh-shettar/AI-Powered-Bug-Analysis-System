@@ -1,0 +1,11 @@
+Title: Order service database connection pool exhausted
+Description: During checkout peaks the order service stops responding. Every request waiting on the connection pool times out after 30 seconds and the pool never recovers until the service is restarted.
+Severity: Critical
+Component: Database
+Environment: Production
+Error: OperationalError: QueuePool limit of size 10 overflow 0 reached, connection timed out
+Stack_trace: File "orders/repository.py", line 88, in save_order
+    with session_scope() as session:
+  File "sqlalchemy/pool/base.py", line 1204, in _do_get
+    raise exc.TimeoutError()
+sqlalchemy.exc.TimeoutError: QueuePool limit reached

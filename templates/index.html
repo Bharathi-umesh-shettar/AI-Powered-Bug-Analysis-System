@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intelligent Bug Diagnosis Platform with Fix Recommendation Assistance</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">{{ app_group }} &middot; Infosys Springboard Internship</p>
+    <h1>Creation of Intelligent Bug Diagnosis Platform with Fix Recommendation Assistance</h1>
+    <p class="sub">Multi-agent diagnosis over a FAISS + MiniLM knowledge base: structured findings, fix recommendations, duplicate detection, defect pattern analytics and a self-growing knowledge base.</p>
+    <p id="meta-line" class="muted small"></p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="submit">Submit &amp; Diagnose</button>
+    <button class="tab" data-tab="bugs">Bug Records</button>
+    <button class="tab" data-tab="watch">Auto-Watch</button>
+    <button class="tab" data-tab="analytics">Defect Analytics</button>
+    <button class="tab" data-tab="knowledge">Knowledge Base</button>
+  </nav>
+
+  <div id="message" class="message hidden"></div>
+
+  <main class="container">
+    <!-- ------------------------------------------------ Submit -->
+    <section class="panel active" id="panel-submit">
+      <div class="grid-2">
+        <div class="card">
+          <h2>Submit a Bug</h2>
+          <form id="bug-form">
+            <label>Bug Title
+              <input type="text" id="title" required placeholder="e.g. Login fails with 504 on Safari" />
+            </label>
+            <label>Description
+              <textarea id="description" rows="4" required placeholder="What happened, what was expected, steps to reproduce..."></textarea>
+            </label>
+            <div class="row">
+              <label>Severity
+                <select id="severity">
+                  {% for s in severities %}
+                  <option {% if s == 'Medium' %}selected{% endif %}>{{ s }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+              <label>Component / Module
+                <input type="text" id="component" placeholder="e.g. auth-service" />
+              </label>
+            </div>
+            <div class="row">
+              <label>Environment
+                <input type="text" id="environment" placeholder="e.g. Production / Chrome 120" />
+              </label>
+              <label>Error Message
+                <input type="text" id="error_message" placeholder="e.g. TimeoutError: request timed out" />
+              </label>
+            </div>
+            <label>Stack Trace
+              <textarea id="stack_trace" rows="4" placeholder="Optional stack trace..."></textarea>
+            </label>
+            <label>Additional Info
+              <textarea id="additional_info" rows="2" placeholder="Logs, ticket links, affected users..."></textarea>
+            </label>
+            <button type="submit">Diagnose Bug</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Upload Bug Report (.txt / .log)</h2>
+          <p class="muted">Labelled fields (Title, Description, Severity, Component, Environment, Error, Stack Trace) are parsed automatically; raw logs fall back to heuristics.</p>
+          <form id="upload-form">
+            <input type="file" id="file" accept=".txt,.log" required />
+            <button type="submit">Upload &amp; Analyze</button>
+          </form>
+          <div id="findings-actions" class="hidden stack">
+            <h3>Report exports</h3>
+            <a id="pdf-link" class="button secondary" href="#">Download PDF</a>
+            <a id="csv-link" class="button secondary" href="#">Download CSV</a>
+          </div>
+        </div>
+      </div>
+
+      <section class="card">
+        <h2>Structured Findings</h2>
+        <div id="findings">
+          <p class="muted">Submit or upload a bug to generate structured findings, a fix recommendation and similar historical bugs.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ------------------------------------------------ Bugs -->
+    <section class="panel" id="panel-bugs">
+      <div class="card">
+        <h2>Bug Records</h2>
+        <div class="row filters">
+          <input type="text" id="filter-q" placeholder="Search title, cause, component..." />
+          <select id="filter-status"><option value="">All statuses</option>
+            {% for s in statuses %}<option>{{ s }}</option>{% endfor %}
+          </select>
+          <select id="filter-severity"><option value="">All severities</option>
+            {% for s in severities %}<option>{{ s }}</option>{% endfor %}
+          </select>
+          <button id="refresh-btn" class="secondary">Refresh</button>
+          <a class="button secondary" href="/api/bugs/export.csv">Export CSV</a>
+        </div>
+        <div class="table-wrapper">
+          <table id="bugs-table">
+            <thead>
+              <tr><th>ID</th><th>Title</th><th>Severity</th><th>Component</th><th>Status</th><th>Duplicate</th><th>Source</th><th>Created</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card hidden" id="bug-detail">
+        <h2>Bug Detail</h2>
+        <div id="bug-detail-body"></div>
+        <h3>Resolve &amp; Verify (grows the knowledge base)</h3>
+        <form id="resolve-form">
+          <input type="hidden" id="resolve-id" />
+          <label>Confirmed root cause
+            <textarea id="resolve-cause" rows="2" placeholder="What actually caused it"></textarea>
+          </label>
+          <label>Confirmed fix
+            <textarea id="resolve-fix" rows="2" placeholder="The fix that was applied and verified" required></textarea>
+          </label>
+          <label>Verification / resolution details
+            <textarea id="resolve-details" rows="2" placeholder="How the fix was validated (tests, monitoring)"></textarea>
+          </label>
+          <label class="inline"><input type="checkbox" id="resolve-verified" checked /> Mark as Resolved &amp; Verified and add to the knowledge base</label>
+          <button type="submit">Save Resolution</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ Watch -->
+    <section class="panel" id="panel-watch">
+      <div class="card">
+        <h2>Auto-Watch Service</h2>
+        <p class="muted">Drop <code>.log</code> or <code>.txt</code> reports into the watch folder; each new file is parsed, stored, and diagnosed automatically.</p>
+        <p id="watch-summary" class="mono small"></p>
+        <div class="row">
+          <button id="watch-scan" class="secondary">Scan now</button>
+          <button id="watch-start" class="secondary">Start</button>
+          <button id="watch-stop" class="secondary">Stop</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="watch-table">
+            <thead><tr><th>File</th><th>Status</th><th>Detail</th><th>Bug</th><th>Detected</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ Analytics -->
+    <section class="panel" id="panel-analytics">
+      <div class="card">
+        <div class="row between">
+          <h2>Defect Pattern Analytics</h2>
+          <div class="row">
+            <select id="granularity">
+              <option value="">Auto</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <button id="analytics-refresh" class="secondary">Refresh</button>
+            <a class="button secondary" href="/api/analytics/report.csv">CSV</a>
+            <a class="button secondary" href="/api/analytics/report.pdf">PDF</a>
+          </div>
+        </div>
+        <div id="kpis" class="kpi-grid"></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><h3>Severity distribution</h3><div id="chart-severity" class="chart"></div></div>
+        <div class="card"><h3>Most affected components</h3><div id="chart-components" class="chart"></div></div>
+        <div class="card"><h3>Frequent error types</h3><div id="chart-errors" class="chart"></div></div>
+        <div class="card"><h3>Recurring root causes</h3><div id="chart-causes" class="chart"></div></div>
+        <div class="card"><h3>Recurring themes</h3><div id="chart-themes" class="chart"></div></div>
+        <div class="card"><h3>Defect trend</h3><div id="chart-trend" class="chart"></div></div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ Knowledge -->
+    <section class="panel" id="panel-knowledge">
+      <div class="card">
+        <h2>Knowledge Base</h2>
+        <p id="kb-summary" class="mono small"></p>
+        <div class="row">
+          <input type="text" id="kb-search" placeholder="Search knowledge entries..." />
+          <button id="kb-refresh" class="secondary">Refresh</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="kb-table">
+            <thead><tr><th>ID</th><th>Title</th><th>Category</th><th>Severity</th><th>Root cause</th><th>Suggested fix</th><th>Origin</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><p>{{ app_title }} &middot; {{ app_group }} &middot; Flask, SQLite, Sentence Transformers (all-MiniLM-L6-v2), FAISS.</p></footer>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

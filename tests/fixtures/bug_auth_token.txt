@@ -1,0 +1,8 @@
+Title: Session token not refreshed after SSO login
+Description: Users signing in through the SSO provider are redirected back to the app but the session token is dropped, so the dashboard immediately bounces them back to the login page.
+Severity: High
+Component: Authentication
+Environment: Staging
+Error: TypeError: cannot read property 'access_token' of undefined
+Stack_trace: at handleCallback (auth/callback.js:42:19)
+    at processRedirect (auth/session.js:17:8)
